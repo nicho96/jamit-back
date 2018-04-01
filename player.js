@@ -85,7 +85,8 @@ class Player {
      *  Request GET data.
      */
     _createRoom(){
-        let token = this.accessToken;
+        console.log("creating room");
+	    let token = this.accessToken;
         this.spotifyApi.getMe((err, data)=>{
             if(!err){
                 let user_id = data.body.id;
