@@ -165,24 +165,60 @@ class Player {
      * Handles playing the current song.
      */
     play(){
-    	this.spotifyApi.play();
-        this.end();
+        let channel_id = this.query.channel_id;
+        DB.getChannelInfoByChannelId(channel_id, (info) => {
+            if(info){
+                let user_id = info.user_id;
+                let playlist_id = info.playlist_id;
+                let token = info.master_token;
+                this.spotifyApi.setAccessToken(token);
+                this.spotifyApi.play();
+                this.end();
+            }else{
+                console.log("Error loading channel info: " + channel_id);
+                this.end();
+            }
+        });
     }
 
     /*
      * Handles pausing playback.
      */
     pause(){
-    	this.spotifyApi.pause();
-        this.end();
+        let channel_id = this.query.channel_id;
+        DB.getChannelInfoByChannelId(channel_id, (info) => {
+            if(info){
+                let user_id = info.user_id;
+                let playlist_id = info.playlist_id;
+                let token = info.master_token;
+                this.spotifyApi.setAccessToken(token);
+                this.spotifyApi.pause();
+                this.end();
+            }else{
+                console.log("Error loading channel info: " + channel_id);
+                this.end();
+            }
+        });
     }
 
     /*
      * Handles skipping the song.
      */
     skip(){
-        this.spotifyApi.skipToNext();
-        this.end();
+        let channel_id = this.query.channel_id;
+        DB.getChannelInfoByChannelId(channel_id, (info) => {
+            if(info){
+                let user_id = info.user_id;
+                let playlist_id = info.playlist_id;
+                let token = info.master_token;
+                this.spotifyApi.setAccessToken(token);
+                this.spotifyApi.skipToNext();
+                this.end();
+            }else{
+                console.log("Error loading channel info: " + channel_id);
+                this.end();
+            }
+        });
     }
 
     /*
@@ -191,9 +227,21 @@ class Player {
      * TODO - We need to set the current playlist, and ensure it's not on shuffle.
      */
     start(){
-        this.spotifyApi.pause(() => {
-            this.spotifyApi.play();
-            this.end();
+        let channel_id = this.query.channel_id;
+        DB.getChannelInfoByChannelId(channel_id, (info) => {
+            if(info){
+                let user_id = info.user_id;
+                let playlist_id = info.playlist_id;
+                let token = info.master_token;
+                this.spotifyApi.setAccessToken(token);
+                this.spotifyApi.pause(() => {
+                    this.spotifyApi.play();
+                    this.end();
+                });
+            }else{
+                console.log("Error loading channel info: " + channel_id);
+                this.end();
+            }
         });
     }
 
