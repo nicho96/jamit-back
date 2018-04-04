@@ -13,6 +13,7 @@ const channel_get_channelid = "SELECT * FROM channels WHERE channel_id = ?";
 const channel_create = "INSERT INTO channels (user_id, playlist_id, name, master_token) VALUES (?, ?, ?, ?)";
 const channel_list = "SELECT user_id, channel_id, name FROM channels";
 const channel_token_update = "UPDATE channels SET master_token = ? WHERE user_id = ?";
+const channel_playing = "UPDATE channels SET playing = ? WHERE channel_id = ?";
 
 module.exports = {
 
@@ -61,6 +62,14 @@ module.exports = {
 
     updateChannelTokenByUserId(user_id, token){
         db.run(channel_token_update, [token, user_id], function(err, rows){
+            if(err){
+                console.log(err);
+            }
+        });
+    },
+
+    updatePlaybackState(channel_id, state){
+        db.run(channel_playing, [state, channel_id], function(err, rows){
             if(err){
                 console.log(err);
             }

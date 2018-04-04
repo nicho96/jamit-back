@@ -60,6 +60,11 @@ class Player {
             this._updateChannelAccessToken();
         })
 
+        express.get('/channelinfo', (req, res) => {
+            this._prepareRequest(req, res);
+            this.channelInfo();
+        })
+
     }
 
     _prepareRequest(req, res){
@@ -173,6 +178,7 @@ class Player {
                 let token = info.master_token;
                 this.spotifyApi.setAccessToken(token);
                 this.spotifyApi.play();
+                DB.updatePlaybackState(channel_id, true);
                 this.end();
             }else{
                 console.log("Error loading channel info: " + channel_id);
@@ -193,6 +199,7 @@ class Player {
                 let token = info.master_token;
                 this.spotifyApi.setAccessToken(token);
                 this.spotifyApi.pause();
+                DB.updatePlaybackState(channel_id, false);
                 this.end();
             }else{
                 console.log("Error loading channel info: " + channel_id);
@@ -236,12 +243,26 @@ class Player {
                 this.spotifyApi.setAccessToken(token);
                 this.spotifyApi.pause(() => {
                     this.spotifyApi.play();
+                    DB.updatePlaybackState(channel_id, true);
                     this.end();
                 });
             }else{
                 console.log("Error loading channel info: " + channel_id);
                 this.end();
             }
+        });
+    }
+
+
+    /*
+     * Get channel info.
+     */
+    channelInfo(){
+        let channel_id = this.query.channel_id;
+        DB.getChannelInfoByChannelId(channel_id, (info) => {
+            info.master_token = "CENSORED BY SOPA";
+            info.playlist_id = "Sometimes, you just need to cry.";
+            this.end(JSON.stringify(info));
         });
     }
 
