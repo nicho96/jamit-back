@@ -65,6 +65,16 @@ class Player {
             this.channelInfo();
         })
 
+        express.get('/playlist', (req, res) => {
+            this._prepareRequest(req, res);
+            this.playlist();
+        })
+
+        express.get('/current', (req, res) => {
+            this._prepareRequest(req, res);
+            this.current();
+        })
+
     }
 
     _prepareRequest(req, res){
@@ -90,7 +100,6 @@ class Player {
      *  Request GET data.
      */
     _createRoom(){
-        console.log("creating room");
 	    let token = this.accessToken;
         this.spotifyApi.getMe((err, data)=>{
             if(!err){
@@ -260,11 +269,56 @@ class Player {
     channelInfo(){
         let channel_id = this.query.channel_id;
         DB.getChannelInfoByChannelId(channel_id, (info) => {
-            info.master_token = "CENSORED BY SOPA";
-            info.playlist_id = "Sometimes, you just need to cry.";
-            this.end(JSON.stringify(info));
+            if (info) {
+                info.master_token = "CENSORED BY SOPA";
+                info.playlist_id = "Sometimes, you just need to cry.";
+                this.end(JSON.stringify(info));
+            } else {
+                console.log("Failed to load info for channel " + channel_id);
+                this.end("{}");
+            }
         });
     }
+
+    /*
+     * Get playlist.
+     */
+    playlist(){
+        let channel_id = this.query.channel_id;
+        DB.getChannelInfoByChannelId(channel_id, (info) => {
+            if (info) {
+                let token = info.master_token;
+                this.spotifyApi.setAccessToken(token);
+                this.spotifyApi.getPlaylist(info.user_id, info.playlist_id, {}, (error, data) => {
+                    this.end(JSON.stringify(data));
+                });
+            } else {
+                console.log("Failed to load info for channel " + channel_id);
+                this.end("{}");
+            }
+        });
+    }
+
+    /*
+     * Get current track.
+     */
+    current(){
+        let channel_id = this.query.channel_id;
+        DB.getChannelInfoByChannelId(channel_id, (info) => {
+            if (info) {
+                let token = info.master_token;
+                this.spotifyApi.setAccessToken(token);
+                this.spotifyApi.getMyCurrentPlayingTrack({}, (error, data) => {
+                    this.end(JSON.stringify(data));
+                });
+            } else {
+                console.log("Failed to load info for channel " + channel_id);
+                this.end("{}");
+            }
+        });
+    }
+
+
 
     _listChannels(){
         DB.getChannelList((list) => {
