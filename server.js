@@ -2,7 +2,7 @@ var express = require('express')();
 var http = require('http');
 var server = http.Server(express);
 var Player = require('./player.js');
-var io = require('socket.io')(server, {pingTimeout: 30000});
+var io = require('socket.io')(server, {pingTimeout: 2000});
 
 var connected = 0;
 

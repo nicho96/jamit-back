@@ -4,6 +4,8 @@ const DB = require('./db-utils');
 
 var url = require('url');
 
+var i = 0;
+
 class Player {
 
     /**
@@ -79,6 +81,8 @@ class Player {
 
     _prepareRequest(req, res){
 
+        i = i + 1;
+        console.log("CONNECTION " + req.path + " " + JSON.stringify(req.query) + " " + req.connection.remoteAddress);
         this.res = res;
         this.query = req.query;
         this.accessToken = req.query.token;
@@ -290,7 +294,11 @@ class Player {
                 let token = info.master_token;
                 this.spotifyApi.setAccessToken(token);
                 this.spotifyApi.getPlaylist(info.user_id, info.playlist_id, {}, (error, data) => {
-                    this.end(JSON.stringify(data));
+                    if (data) {
+                        this.end(JSON.stringify(data));
+                    } else {
+                        console.log("FUCK");
+                    }
                 });
             } else {
                 console.log("Failed to load info for channel " + channel_id);
@@ -309,7 +317,11 @@ class Player {
                 let token = info.master_token;
                 this.spotifyApi.setAccessToken(token);
                 this.spotifyApi.getMyCurrentPlayingTrack({}, (error, data) => {
-                    this.end(JSON.stringify(data));
+                    if (data) {
+                        this.end(JSON.stringify(data));
+                    } else {
+                        this.end("{}");
+                    }
                 });
             } else {
                 console.log("Failed to load info for channel " + channel_id);
