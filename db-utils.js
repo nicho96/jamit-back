@@ -14,6 +14,7 @@ const channel_create = "INSERT INTO channels (user_id, playlist_id, name, master
 const channel_list = "SELECT user_id, channel_id, name FROM channels";
 const channel_token_update = "UPDATE channels SET master_token = ? WHERE user_id = ?";
 const channel_playing = "UPDATE channels SET playing = ? WHERE channel_id = ?";
+const purge_all_the_things = "DELETE FROM channels";
 
 module.exports = {
 
@@ -74,6 +75,14 @@ module.exports = {
                 console.log(err);
             }
         });
-    }
+    },
+
+    deleteChannels(){
+        db.run(purge_all_the_things, [], function(err, rows){
+            if(err){
+                console.log(err);
+            }
+        });
+    },
 
 }
